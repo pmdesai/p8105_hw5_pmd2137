@@ -23,12 +23,12 @@ Create a tidy dataframe containing data from all participants, including the sub
 
 ```{r}
 # read in files in data folder
-filenames <- list.files("data", pattern="*.csv", full.names=TRUE)
-
-#create a combines datframe
+filenames <- list.files("data/problem-1", pattern="*.csv", full.names=TRUE)
+filenames
+#create a combines dataframe
 combo_data <- map_df(filenames, read.csv,stringsAsFactors = FALSE, .id = 'filename') %>%
-  mutate(filename = substr(filenames,6,11)) %>% #shorten filename variable
-  mutate(condition = substr(filenames,6,8), # add condition variable
+  mutate(filename = substr(filenames,16,21)) %>% #shorten filename variable
+  mutate(condition = substr(filenames,16,18), # add condition variable
                 condition = recode(condition, "con" = "control", "exp" = "experimental"),
                 condition = factor(condition)) %>%
   janitor::clean_names()
@@ -48,17 +48,24 @@ combo_tidy_data <- pivot_longer(combo_data, week_1:week_8,
 p <- ggplot(data = combo_tidy_data, aes(x = week, y = value, color = condition, group = filename))
 p + geom_line()
 ```
-Looking at the plot we can see differences in the trends between the control and expeirmental groups across weeks of the study. 
+Looking at the plot we can see differences in the trends between the control and experimental groups across weeks of the study. 
 
 Both control and experimental particpants began the study in a similar value in week 0. Values for participants in the control group remain in a relatively consistent across the 8 weeks of the study. Values for participants in the experimental group appear to trend upward across weeks of the study.
 
 
-
 ### Problem 2
 
-The Washington Post has gathered data on homicides in 50 large U.S. cities and made the data available through a GitHub repository here. You can read their accompanying article here.
+The Washington Post has gathered data on homicides in 50 large U.S. cities and made the data available through a GitHub repository.
 
-Describe the raw data. Create a city_state variable (e.g. “Baltimore, MD”) and then summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
+###### Raw Data Description: 
+The file consists of information for 52,179 homicide victims from 2010 to 2013. For each victim, the file contains information across 12 variables including their name, sex, the date the homicide was reported, the city, the state, region (latitude and longitude), and legal case status (disposition). 
+
+```{r}
+# read in homicides file
+homicides_df <- read.csv("data/problem-2/homicide-data.csv")
+```
+
+Create a city_state variable (e.g. “Baltimore, MD”) and then summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
 
 For the city of Baltimore, MD, use the prop.test function to estimate the proportion of homicides that are unsolved; save the output of prop.test as an R object, apply the broom::tidy to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
 
